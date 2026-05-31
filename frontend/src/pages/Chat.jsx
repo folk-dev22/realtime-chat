@@ -18,6 +18,7 @@ export default function Chat() {
         setMessages(data);
       } catch (error) {
         console.error(error);
+        setMessages([]);
       }
     };
     fetchMessages();
@@ -28,13 +29,24 @@ export default function Chat() {
   }, [messages]);
 
   return (
-    <div className="flex h-screen bg-gray-900">
+    <div className="flex h-screen bg-gray-800">
       <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <div className="p-4 border-b border-gray-700 bg-gray-800">
-          <h2 className="text-white font-semibold"># {currentRoom}</h2>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-700 bg-gray-900 flex items-center gap-2">
+          <span className="text-gray-400 text-lg">#</span>
+          <h2 className="text-white font-semibold">{currentRoom}</h2>
         </div>
-        <div className="flex-1 overflow-y-auto p-4">
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-1">
+          {messages.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <p className="text-4xl mb-3">💬</p>
+              <p className="text-gray-400 font-medium">ยังไม่มีข้อความใน #{currentRoom}</p>
+              <p className="text-gray-500 text-sm mt-1">เริ่มการสนทนากันเลย!</p>
+            </div>
+          )}
           {messages.map((msg) => (
             <MessageBubble
               key={msg._id}
@@ -44,7 +56,9 @@ export default function Chat() {
           ))}
           <div ref={bottomRef} />
         </div>
-        <MessageInput onSend={sendMessage} />
+
+        {/* Input */}
+        <MessageInput onSend={sendMessage} room={currentRoom} />
       </div>
     </div>
   );
