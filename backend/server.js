@@ -22,8 +22,11 @@ app.use(cors({ origin: process.env.CLIENT_URL }));
 app.use(express.json());
 
 // Routes
+// Routes
+const authRoutes = require('./src/routes/auth');
+app.use('/api/auth', authRoutes);
+
 app.get('/', (req, res) => {
-  res.json({ message: '🚀 Chat API is running!' });
 });
 
 // Socket.io
