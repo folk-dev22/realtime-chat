@@ -1,0 +1,92 @@
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import api from '../utils/api';
+import useStore from '../store/useStore';
+
+export default function Register() {
+  const [form, setForm] = useState({ username: '', email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { setUser } = useStore();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const { data } = await api.post('/auth/register', form);
+      setUser(data, data.token);
+      navigate('/chat');
+    } catch (err) {
+      setError(err.response?.data?.message || 'เกิดข้อผิดพลาด');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="bg-gray-800 p-8 rounded-xl w-full max-w-md">
+        <h1 className="text-3xl font-bold text-white mb-2">สมัครสมาชิก 🚀</h1>
+        <p className="text-gray-400 mb-6">สร้างบัญชีใหม่เพื่อเริ่มแชท</p>
+
+        {error && (
+          <div className="bg-red-500/20 text-red-400 p-3 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="text-gray-300 text-sm mb-1 block">Username</label>
+            <input
+              type="text"
+              value={form.username}
+              onChange={(e) => setForm({ ...form, username: e.target.value })}
+              className="w-full bg-gray-700 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="kongkray"
+              required
+            />
+          </div>
+          <div>
+            <label className="text-gray-300 text-sm mb-1 block">Email</label>
+            <input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              className="w-full bg-gray-700 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="email@example.com"
+              required
+            />
+          </div>
+          <div>
+            <label className="text-gray-300 text-sm mb-1 block">Password</label>
+            <input
+              type="password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              className="w-full bg-gray-700 text-white p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold p-3 rounded-lg transition disabled:opacity-50"
+          >
+            {loading ? 'กำลังสมัคร...' : 'สมัครสมาชิก'}
+          </button>
+        </form>
+
+        <p className="text-gray-400 text-center mt-4">
+          มีบัญชีแล้ว?{' '}
+          <Link to="/login" className="text-indigo-400 hover:underline">
+            เข้าสู่ระบบ
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
